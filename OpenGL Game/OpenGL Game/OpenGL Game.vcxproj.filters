@@ -30,6 +30,9 @@
     <ClCompile Include="src\common\Maths\vec3.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="src\common\Shaders\Shaders.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\common\Buffers\VertexArray.h">
@@ -44,5 +47,12 @@
     <ClInclude Include="src\common\Maths\vec3.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="src\common\Shaders\Shaders.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="src\common\Shaders\GLSL\VertexShader.vs" />
+    <None Include="src\common\Shaders\GLSL\FragmentShader.vs" />
   </ItemGroup>
 </Project>

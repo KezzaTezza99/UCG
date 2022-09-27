@@ -3,6 +3,8 @@
 #include <iostream>
 #include "src/common/Buffers/VertexArray.h"
 #include "src/common/Buffers/VertexBuffer.h"
+#include "src/common/Shaders/Shaders.h"
+
 //TODO: Break shaders into a class
 //Global constants
 const int WIDTH = 800;
@@ -30,23 +32,23 @@ const char* fragmentShaderSource =  "#version 330 core\n"
 */
 
 //Added Colours to the vertices data
-const char* vertexShaderSource = "#version 330 core\n"
-								 "layout (location = 0) in vec3 aPos;\n"
-								 "layout (location = 1) in vec3 aColour;\n"
-								 "out vec3 ourColour;\n"
-								 "void main()\n"
-								 "{\n"
-								 "   gl_Position = vec4(aPos, 1.0);\n"
-								 "	 ourColour = aColour;\n"
-								 "}\0";
-
-const char* fragmentShaderSource = "#version 330 core\n"
-								   "out vec4 FragColour;\n"
-								   "in vec3 ourColour;\n"
-								   "void main()\n"
-								   "{\n"
-								   "   FragColour = vec4(ourColour, 1.0);\n"
-								   "}\0";
+//const char* vertexShaderSource = "#version 330 core\n"
+//								 "layout (location = 0) in vec3 aPos;\n"
+//								 "layout (location = 1) in vec3 aColour;\n"
+//								 "out vec3 ourColour;\n"
+//								 "void main()\n"
+//								 "{\n"
+//								 "   gl_Position = vec4(aPos, 1.0);\n"
+//								 "	 ourColour = aColour;\n"
+//								 "}\0";
+//
+//const char* fragmentShaderSource = "#version 330 core\n"
+//								   "out vec4 FragColour;\n"
+//								   "in vec3 ourColour;\n"
+//								   "void main()\n"
+//								   "{\n"
+//								   "   FragColour = vec4(ourColour, 1.0);\n"
+//								   "}\0";
 
 int main()
 {
@@ -138,28 +140,34 @@ int main()
 	//TODO: Think of an efficent way to pass in the data to send data to opengl in buffer classess instead of here
 	glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
 
-	//Vertex Shader
-	unsigned int vertexShader = glCreateShader(GL_VERTEX_SHADER);
-	glShaderSource(vertexShader, 1, &vertexShaderSource, NULL);
-	glCompileShader(vertexShader);
+	//OLD WAY
+	/*
+		//Vertex Shader
+		unsigned int vertexShader = glCreateShader(GL_VERTEX_SHADER);
+		glShaderSource(vertexShader, 1, &vertexShaderSource, NULL);
+		glCompileShader(vertexShader);
 
-	//Fragment Shader
-	unsigned int fragmentShader = glCreateShader(GL_FRAGMENT_SHADER);
-	glShaderSource(fragmentShader, 1, &fragmentShaderSource, NULL);
-	glCompileShader(fragmentShader);
+		//Fragment Shader
+		unsigned int fragmentShader = glCreateShader(GL_FRAGMENT_SHADER);
+		glShaderSource(fragmentShader, 1, &fragmentShaderSource, NULL);
+		glCompileShader(fragmentShader);
 
-	//Creating a shader program
-	GLuint shaderProgram;
-	shaderProgram = glCreateProgram();
+		//Creating a shader program
+		GLuint shaderProgram;
+		shaderProgram = glCreateProgram();
 
-	//Attaching the compiled shaders to the program
-	glAttachShader(shaderProgram, vertexShader);
-	glAttachShader(shaderProgram, fragmentShader);
-	glLinkProgram(shaderProgram);
+		//Attaching the compiled shaders to the program
+		glAttachShader(shaderProgram, vertexShader);
+		glAttachShader(shaderProgram, fragmentShader);
+		glLinkProgram(shaderProgram);
 
-	//Cleaning up the shaders as they are now not needed
-	glDeleteShader(vertexShader);
-	glDeleteShader(fragmentShader);
+		//Cleaning up the shaders as they are now not needed
+		glDeleteShader(vertexShader);
+		glDeleteShader(fragmentShader);
+	*/
+
+	Shaders shaders;
+	shaders.LoadShader("src/common/Shaders/GLSL/VertexShader.vs", "src/common/Shaders/GLSL/FragmentShader.vs");
 
 	//------------------------------------------------------------------
 	//Render loop / Game loop
@@ -173,7 +181,8 @@ int main()
 		//Handle Input
 
 		//Render
-		glUseProgram(shaderProgram);
+		//glUseProgram(shaderProgram);
+		shaders.ActivateShaders();
 
 		//Re-bindng
 		glEnableVertexAttribArray(0);
@@ -187,7 +196,7 @@ int main()
 		glEnableVertexAttribArray(0);
 
 		//Colour
-		glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float), (void*)0);
+		glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float), (void*)(3 * sizeof(float)));
 		glEnableVertexAttribArray(1);
 
 ;		//Drawing
@@ -200,7 +209,7 @@ int main()
 	}
 
 	//De-allocating resources
-	glDeleteProgram(shaderProgram);
+	//glDeleteProgram(shaderProgram);
 
 	//Clearing all allocated GLFW resources
 	glfwTerminate();
