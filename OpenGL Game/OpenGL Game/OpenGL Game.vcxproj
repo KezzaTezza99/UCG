@@ -73,26 +73,26 @@
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <OutDir>$(SolutionDir)$(Configuration)\Output\</OutDir>
     <IntDir>$(SolutionDir)$(Configuration)\Intermediates\</IntDir>
-    <IncludePath>C:\Dev\OpenGL Game\OpenGL Game\Dependencies\GLFW\include;C:\Dev\OpenGL Game\OpenGL Game\Dependencies\GLEW\include;$(IncludePath)</IncludePath>
-    <LibraryPath>C:\Dev\OpenGL Game\OpenGL Game\Dependencies\GLFW\lib-vc2019;C:\Dev\OpenGL Game\OpenGL Game\Dependencies\GLEW\lib;$(LibraryPath)</LibraryPath>
+    <IncludePath>$(SolutionDir)OpenGL Game\Dependencies\GLFW\include;$(SolutionDir)OpenGL Game\Dependencies\GLEW\include;$(IncludePath)</IncludePath>
+    <LibraryPath>$(SolutionDir)OpenGL Game\Dependencies\GLFW\lib-vc2019;$(SolutionDir)OpenGL Game\Dependencies\GLEW\lib;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <OutDir>$(SolutionDir)$(Configuration)\Output\</OutDir>
     <IntDir>$(SolutionDir)$(Configuration)\Intermediates\</IntDir>
-    <IncludePath>C:\Dev\OpenGL Game\OpenGL Game\Dependencies\GLFW\include;C:\Dev\OpenGL Game\OpenGL Game\Dependencies\GLEW\include;$(IncludePath)</IncludePath>
-    <LibraryPath>C:\Dev\OpenGL Game\OpenGL Game\Dependencies\GLFW\lib-vc2019;C:\Dev\OpenGL Game\OpenGL Game\Dependencies\GLEW\lib;$(LibraryPath)</LibraryPath>
+    <IncludePath>$(SolutionDir)OpenGL Game\Dependencies\GLFW\include;$(SolutionDir)OpenGL Game\Dependencies\GLEW\include;$(IncludePath)</IncludePath>
+    <LibraryPath>$(SolutionDir)OpenGL Game\Dependencies\GLFW\lib-vc2019;$(SolutionDir)OpenGL Game\Dependencies\GLEW\lib;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <OutDir>$(SolutionDir)$(Configuration)\Output</OutDir>
     <IntDir>$(SolutionDir)$(Configuration)\Intermediates</IntDir>
-    <IncludePath>C:\Dev\OpenGL Game\OpenGL Game\Dependencies\GLFW\include;C:\Dev\OpenGL Game\OpenGL Game\Dependencies\GLEW\include;$(IncludePath)</IncludePath>
-    <LibraryPath>C:\Dev\OpenGL Game\OpenGL Game\Dependencies\GLFW\lib-vc2019;C:\Dev\OpenGL Game\OpenGL Game\Dependencies\GLEW\lib;$(LibraryPath)</LibraryPath>
+    <IncludePath>$(SolutionDir)OpenGL Game\Dependencies\GLFW\include;$(SolutionDir)OpenGL Game\Dependencies\GLEW\include;$(IncludePath)</IncludePath>
+    <LibraryPath>$(SolutionDir)OpenGL Game\Dependencies\GLFW\lib-vc2019;$(SolutionDir)OpenGL Game\Dependencies\GLEW\lib;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <OutDir>$(SolutionDir)$(Configuration)\Output</OutDir>
     <IntDir>$(SolutionDir)$(Configuration)\Intermediates</IntDir>
-    <IncludePath>C:\Dev\OpenGL Game\OpenGL Game\Dependencies\GLFW\include;C:\Dev\OpenGL Game\OpenGL Game\Dependencies\GLEW\include;$(IncludePath)</IncludePath>
-    <LibraryPath>C:\Dev\OpenGL Game\OpenGL Game\Dependencies\GLFW\lib-vc2019;C:\Dev\OpenGL Game\OpenGL Game\Dependencies\GLEW\lib;$(LibraryPath)</LibraryPath>
+    <IncludePath>$(SolutionDir)OpenGL Game\Dependencies\GLFW\include;$(SolutionDir)OpenGL Game\Dependencies\GLEW\include;$(IncludePath)</IncludePath>
+    <LibraryPath>$(SolutionDir)OpenGL Game\Dependencies\GLFW\lib-vc2019;$(SolutionDir)OpenGL Game\Dependencies\GLEW\lib;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
@@ -156,6 +156,16 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="EntryPoint.cpp" />
+    <ClCompile Include="src\common\Maths\vec3.cpp" />
+    <ClCompile Include="src\common\Models\PrimitiveShapes.cpp" />
+    <ClCompile Include="src\common\Buffers\VertexArray.cpp" />
+    <ClCompile Include="src\common\Buffers\VertexBuffer.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="src\common\Maths\vec3.h" />
+    <ClInclude Include="src\common\Models\PrimitiveShapes.h" />
+    <ClInclude Include="src\common\Buffers\VertexArray.h" />
+    <ClInclude Include="src\common\Buffers\VertexBuffer.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
