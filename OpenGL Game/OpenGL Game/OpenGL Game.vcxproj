@@ -156,6 +156,8 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="EntryPoint.cpp" />
+    <ClCompile Include="src\common\Buffers\IndexBuffer.cpp" />
+    <ClCompile Include="Librairies\stb.cpp" />
     <ClCompile Include="src\common\Shaders\Shaders.cpp" />
     <ClCompile Include="src\common\Maths\vec3.cpp" />
     <ClCompile Include="src\common\Models\PrimitiveShapes.cpp" />
@@ -163,6 +165,7 @@
     <ClCompile Include="src\common\Buffers\VertexBuffer.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="src\common\Buffers\IndexBuffer.h" />
     <ClInclude Include="src\common\Shaders\Shaders.h" />
     <ClInclude Include="src\common\Maths\vec3.h" />
     <ClInclude Include="src\common\Models\PrimitiveShapes.h" />

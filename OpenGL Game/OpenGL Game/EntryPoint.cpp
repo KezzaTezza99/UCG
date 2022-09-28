@@ -1,54 +1,18 @@
 #include <GL/glew.h>
 #include <GLFW/glfw3.h>
 #include <iostream>
+#include "Librairies/stb/stb_image.h"
 #include "src/common/Buffers/VertexArray.h"
 #include "src/common/Buffers/VertexBuffer.h"
+#include "src/common/Buffers/IndexBuffer.h"
 #include "src/common/Shaders/Shaders.h"
 
-//TODO: Break shaders into a class
 //Global constants
 const int WIDTH = 800;
 const int HEIGHT = 600;
 
 //Callback functions
 void framebuffer_size_callback(GLFWwindow* window, int width, int height);
-
-//TODO: Break this into their own classes
-// SHADER STUFF - Original
-/*
-const char* vertexShaderSource = "#version 330 core\n"
-								 "layout (location = 0) in vec3 aPos;\n"
-								 "void main()\n"
-								 "{\n"
-								 "   gl_Position = vec4(aPos.x, aPos.y, aPos.z, 1.0);\n"
-								 "}\0";
-
-const char* fragmentShaderSource =  "#version 330 core\n"
-									"out vec4 FragColor;\n"
-									"void main()\n"
-									"{\n"
-									"   FragColor = vec4(1.0f, 0.5f, 0.2f, 1.0);\n"
-									"}\0";
-*/
-
-//Added Colours to the vertices data
-//const char* vertexShaderSource = "#version 330 core\n"
-//								 "layout (location = 0) in vec3 aPos;\n"
-//								 "layout (location = 1) in vec3 aColour;\n"
-//								 "out vec3 ourColour;\n"
-//								 "void main()\n"
-//								 "{\n"
-//								 "   gl_Position = vec4(aPos, 1.0);\n"
-//								 "	 ourColour = aColour;\n"
-//								 "}\0";
-//
-//const char* fragmentShaderSource = "#version 330 core\n"
-//								   "out vec4 FragColour;\n"
-//								   "in vec3 ourColour;\n"
-//								   "void main()\n"
-//								   "{\n"
-//								   "   FragColour = vec4(ourColour, 1.0);\n"
-//								   "}\0";
 
 int main()
 {
@@ -97,29 +61,33 @@ int main()
 	//------------------------------------------------------------------
 	// Add all code here
 	// 
+	//TODO: Make a primitive shapes class? - Easily add shapes if needed	
+	//------------------------------------------------------------------
 	
-	//TODO: Make a primitive shapes class? - Easily add shapes if needed
-	
-	//Simple Triangle
-	GLfloat vertices[] =
-	{
-		//Positions					//Colours
-		-0.5f, -0.5f, 0.0f,			0.0f, 1.0f, 0.0f,			//Bottom left
-		 0.5f, -0.5f, 0.0f,			1.0f, 0.0f, 0.0f,			//Bottom right
-		 0.0f,  0.5f, 0.0f,			0.0f, 0.0f, 1.0f			//Top
-	};
-	
-	////Simple Quad
-	//GLfloat vertices[] = {
-	//	// first triangle
-	//	 0.5f,  0.5f, 0.0f,  // top right
-	//	 0.5f, -0.5f, 0.0f,  // bottom right
-	//	-0.5f,  0.5f, 0.0f,  // top left 
-	//	// second triangle
-	//	 0.5f, -0.5f, 0.0f,  // bottom right
-	//	-0.5f, -0.5f, 0.0f,  // bottom left
-	//	-0.5f,  0.5f, 0.0f   // top left
+	////Simple Triangle
+	//GLfloat vertices[] =
+	//{
+	//	//Positions					//Colours
+	//	-0.5f, -0.5f, 0.0f,			0.0f, 1.0f, 0.0f,			//Bottom left
+	//	 0.5f, -0.5f, 0.0f,			1.0f, 0.0f, 0.0f,			//Bottom right
+	//	 0.0f,  0.5f, 0.0f,			0.0f, 0.0f, 1.0f			//Top
 	//};
+
+	//Textured Quad
+	float vertices[] = 
+	{
+		// positions          // colors           // texture coords
+		 0.5f,  0.5f, 0.0f,   1.0f, 0.0f, 0.0f,   1.0f, 1.0f,   // top right
+		 0.5f, -0.5f, 0.0f,   0.0f, 1.0f, 0.0f,   1.0f, 0.0f,   // bottom right
+		-0.5f, -0.5f, 0.0f,   0.0f, 0.0f, 1.0f,   0.0f, 0.0f,   // bottom left
+		-0.5f,  0.5f, 0.0f,   1.0f, 1.0f, 0.0f,   0.0f, 1.0f    // top left 
+	};
+
+	unsigned int indices[] =
+	{
+		0, 1, 3, // first triangle
+		1, 2, 3  // second triangle
+	};
 
 	//Shapes
 	//maths::vec3 bottomLeft = maths::vec3(-0.5f, -0.5f, 0.0f);
@@ -131,77 +99,93 @@ int main()
 	//GLfloat* vertices = triangle.DrawTriangle(bottomLeft, bottomRight, top);
 	//std::cout << "Debug Info (EntryPoint) -" << "		" << "Vertices " << vertices << std::endl;
 
-	//Buffers
+	// --- Buffers ---
+	//VAO
 	VertexArray vertexArray;
 	vertexArray.Bind();
 	
+	//VBO
 	VertexBuffer vertexBuffer;
 	vertexBuffer.Bind();
 	//TODO: Think of an efficent way to pass in the data to send data to opengl in buffer classess instead of here
 	glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
 
-	//OLD WAY
-	/*
-		//Vertex Shader
-		unsigned int vertexShader = glCreateShader(GL_VERTEX_SHADER);
-		glShaderSource(vertexShader, 1, &vertexShaderSource, NULL);
-		glCompileShader(vertexShader);
+	//IBO
+	IndexBuffer indexBuffer;
+	indexBuffer.Bind();
+	//TODO: Also need to think about handling this inside the IBO class
+	glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indices), indices, GL_STATIC_DRAW);
 
-		//Fragment Shader
-		unsigned int fragmentShader = glCreateShader(GL_FRAGMENT_SHADER);
-		glShaderSource(fragmentShader, 1, &fragmentShaderSource, NULL);
-		glCompileShader(fragmentShader);
+	// --- Setting attributes ---
+	//Position 
+	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)0);
+	glEnableVertexAttribArray(0);
 
-		//Creating a shader program
-		GLuint shaderProgram;
-		shaderProgram = glCreateProgram();
+	//Colour
+	glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)(3 * sizeof(float)));
+	glEnableVertexAttribArray(1);
 
-		//Attaching the compiled shaders to the program
-		glAttachShader(shaderProgram, vertexShader);
-		glAttachShader(shaderProgram, fragmentShader);
-		glLinkProgram(shaderProgram);
+	//Texcoords
+	glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)(6 * sizeof(float)));
+	glEnableVertexAttribArray(2);
 
-		//Cleaning up the shaders as they are now not needed
-		glDeleteShader(vertexShader);
-		glDeleteShader(fragmentShader);
-	*/
-
+	// --- Shaders ---
 	Shaders shaders;
 	shaders.LoadShader("src/common/Shaders/GLSL/VertexShader.vs", "src/common/Shaders/GLSL/FragmentShader.vs");
 
+	// --- Textures ---
+	//Creating and binding a texture - TODO: Make this into a class
+	GLuint texture;
+	glGenTextures(1, &texture);
+	glBindTexture(GL_TEXTURE_2D, texture);
+	
+	// Setting the textures wrapping / filtering options
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+
+	//Loading the image that will be used as a texture
+	int width, height, channels;
+	unsigned char* data = stbi_load("src/assets/Textures/wood.png", &width, &height, &channels, 0);
+
+	if (data)
+	{
+		//Generating the texture from the loaded image
+		glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, data);
+		glGenerateMipmap(GL_TEXTURE_2D);
+	}
+	else
+	{
+		std::cout << "ERROR: Failed to load texture" << std::endl;
+	}
+
+	//Freeing image data
+	stbi_image_free(data);
+
 	//------------------------------------------------------------------
 	//Render loop / Game loop
-	//
+	//------------------------------------------------------------------
 	while (!glfwWindowShouldClose(window))
 	{
 		//Clear the screen 
 		glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
 		glClear(GL_COLOR_BUFFER_BIT);
 
-		//Handle Input
+		// --- Handle Input ---
 
-		//Render
-		//glUseProgram(shaderProgram);
-		shaders.ActivateShaders();
-
-		//Re-bindng
-		glEnableVertexAttribArray(0);
-		vertexBuffer.Bind();
+		// --- Rendering ---
 		
-		//glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 0, (void*)0);
+		//Activating shaders
+		shaders.ActivateShaders();
+		
+		// --- New way ---		
+		//Re-binding the texture
+		glBindTexture(GL_TEXTURE_2D, texture);
+		vertexArray.Bind();
 
-		//Now using colour data and more attributes
-		//Position 
-		glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float), (void*)0);
-		glEnableVertexAttribArray(0);
-
-		//Colour
-		glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float), (void*)(3 * sizeof(float)));
-		glEnableVertexAttribArray(1);
-
-;		//Drawing
-		glDrawArrays(GL_TRIANGLES, 0, 3);
-		glDisableVertexAttribArray(0);
+;		// --- Draw Calls ---
+		glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
 
 		//Check / call events and swap buffers
 		glfwSwapBuffers(window);
@@ -209,10 +193,8 @@ int main()
 	}
 
 	//De-allocating resources
-	//glDeleteProgram(shaderProgram);
-
-	//Clearing all allocated GLFW resources
 	glfwTerminate();
+
 	return 0;
 }
 
