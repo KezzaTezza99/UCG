@@ -2,6 +2,9 @@
 #include <GLFW/glfw3.h>
 #include <iostream>
 #include "Librairies/stb/stb_image.h"
+#include "Librairies/glm/glm.hpp"
+#include "Librairies/glm/gtc/matrix_transform.hpp"
+#include "Librairies/glm/gtc/type_ptr.hpp"
 #include "src/common/Buffers/VertexArray.h"
 #include "src/common/Buffers/VertexBuffer.h"
 #include "src/common/Buffers/IndexBuffer.h"
@@ -55,6 +58,9 @@ int main()
 	//Registering the window resize callback function
 	glfwSetFramebufferSizeCallback(window, framebuffer_size_callback);
 	
+	//Enabling the use of the z buffer
+	glEnable(GL_DEPTH_TEST);
+
 	//Setting the viewport
 	//glViewport(0, 0, 800, 600);
 
@@ -74,19 +80,66 @@ int main()
 	//};
 
 	//Textured Quad
-	float vertices[] = 
-	{
-		// positions          // colors           // texture coords
-		 0.5f,  0.5f, 0.0f,   1.0f, 0.0f, 0.0f,   1.0f, 1.0f,   // top right
-		 0.5f, -0.5f, 0.0f,   0.0f, 1.0f, 0.0f,   1.0f, 0.0f,   // bottom right
-		-0.5f, -0.5f, 0.0f,   0.0f, 0.0f, 1.0f,   0.0f, 0.0f,   // bottom left
-		-0.5f,  0.5f, 0.0f,   1.0f, 1.0f, 0.0f,   0.0f, 1.0f    // top left 
-	};
+	//float vertices[] = 
+	//{
+	//	// positions          // colors           // texture coords
+	//	 0.5f,  0.5f, 0.0f,   1.0f, 0.0f, 0.0f,   1.0f, 1.0f,   // top right
+	//	 0.5f, -0.5f, 0.0f,   0.0f, 1.0f, 0.0f,   1.0f, 0.0f,   // bottom right
+	//	-0.5f, -0.5f, 0.0f,   0.0f, 0.0f, 1.0f,   0.0f, 0.0f,   // bottom left
+	//	-0.5f,  0.5f, 0.0f,   1.0f, 1.0f, 0.0f,   0.0f, 1.0f    // top left 
+	//};
 
 	unsigned int indices[] =
 	{
 		0, 1, 3, // first triangle
 		1, 2, 3  // second triangle
+	};
+
+	//3D Cube
+	float vertices[] = 
+	{
+		//Positions					//Texture Coords
+		-0.5f, -0.5f, -0.5f,		0.0f, 0.0f,
+		 0.5f, -0.5f, -0.5f,		1.0f, 0.0f,
+		 0.5f,  0.5f, -0.5f,		1.0f, 1.0f,
+		 0.5f,  0.5f, -0.5f,		1.0f, 1.0f,
+		-0.5f,  0.5f, -0.5f,		0.0f, 1.0f,
+		-0.5f, -0.5f, -0.5f,		0.0f, 0.0f,
+
+		-0.5f, -0.5f,  0.5f,		0.0f, 0.0f,
+		 0.5f, -0.5f,  0.5f,		1.0f, 0.0f,
+		 0.5f,  0.5f,  0.5f,		1.0f, 1.0f,
+		 0.5f,  0.5f,  0.5f,		1.0f, 1.0f,
+		-0.5f,  0.5f,  0.5f,		0.0f, 1.0f,
+		-0.5f, -0.5f,  0.5f,		0.0f, 0.0f,
+
+		-0.5f,  0.5f,  0.5f,		1.0f, 0.0f,
+		-0.5f,  0.5f, -0.5f,		1.0f, 1.0f,
+		-0.5f, -0.5f, -0.5f,		0.0f, 1.0f,
+		-0.5f, -0.5f, -0.5f,		0.0f, 1.0f,
+		-0.5f, -0.5f,  0.5f,		0.0f, 0.0f,
+		-0.5f,  0.5f,  0.5f,		1.0f, 0.0f,
+
+		 0.5f,  0.5f,  0.5f,		1.0f, 0.0f,
+		 0.5f,  0.5f, -0.5f,		1.0f, 1.0f,
+		 0.5f, -0.5f, -0.5f,		0.0f, 1.0f,
+		 0.5f, -0.5f, -0.5f,		0.0f, 1.0f,
+		 0.5f, -0.5f,  0.5f,		0.0f, 0.0f,
+		 0.5f,  0.5f,  0.5f,		1.0f, 0.0f,
+
+		-0.5f, -0.5f, -0.5f,		0.0f, 1.0f,
+		 0.5f, -0.5f, -0.5f,		1.0f, 1.0f,
+		 0.5f, -0.5f,  0.5f,		1.0f, 0.0f,
+		 0.5f, -0.5f,  0.5f,		1.0f, 0.0f,
+		-0.5f, -0.5f,  0.5f,		0.0f, 0.0f,
+		-0.5f, -0.5f, -0.5f,		0.0f, 1.0f,
+
+		-0.5f,  0.5f, -0.5f,		0.0f, 1.0f,
+		 0.5f,  0.5f, -0.5f,		1.0f, 1.0f,
+		 0.5f,  0.5f,  0.5f,		1.0f, 0.0f,
+		 0.5f,  0.5f,  0.5f,		1.0f, 0.0f,
+		-0.5f,  0.5f,  0.5f,		0.0f, 0.0f,
+		-0.5f,  0.5f, -0.5f,		0.0f, 1.0f
 	};
 
 	//Shapes
@@ -117,17 +170,26 @@ int main()
 	glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indices), indices, GL_STATIC_DRAW);
 
 	// --- Setting attributes ---
-	//Position 
-	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)0);
+		// OLD
+		/*//Position 
+		glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)0);
+		glEnableVertexAttribArray(0);
+
+		//Colour
+		glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)(3 * sizeof(float)));
+		glEnableVertexAttribArray(1);
+
+		//Texcoords
+		glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)(6 * sizeof(float)));
+		glEnableVertexAttribArray(2);
+	*/
+	//Pos
+	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 5 * sizeof(float), (void*)0);
 	glEnableVertexAttribArray(0);
 
-	//Colour
-	glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)(3 * sizeof(float)));
+	//UVs
+	glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 5 * sizeof(float), (void*)(3 * sizeof(float)));
 	glEnableVertexAttribArray(1);
-
-	//Texcoords
-	glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)(6 * sizeof(float)));
-	glEnableVertexAttribArray(2);
 
 	// --- Shaders ---
 	Shaders shaders;
@@ -148,6 +210,17 @@ int main()
 	//Loading the image that will be used as a texture
 	int width, height, channels;
 	unsigned char* data = stbi_load("src/assets/Textures/wood.png", &width, &height, &channels, 0);
+
+	/*
+		// --- Transformations ---
+		glm::mat4 transform = glm::mat4(1.0f);
+		transform = glm::rotate(transform, glm::radians(90.0f), glm::vec3(0.0, 0.0, 1.0f));
+		transform = glm::scale(transform, glm::vec3(0.5, 0.5, 0.5));
+
+		//Sending the transform to the vertex shader
+		unsigned int transformLocation = glGetUniformLocation(shaders.GetID(), "transform");
+		glUniformMatrix4fv(transformLocation, 1, GL_FALSE, glm::value_ptr(transform));
+	*/
 
 	if (data)
 	{
@@ -170,7 +243,7 @@ int main()
 	{
 		//Clear the screen 
 		glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
-		glClear(GL_COLOR_BUFFER_BIT);
+		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
 		// --- Handle Input ---
 
@@ -184,8 +257,35 @@ int main()
 		glBindTexture(GL_TEXTURE_2D, texture);
 		vertexArray.Bind();
 
+		// --- Matrices ---
+		//Model Matrix
+		glm::mat4 modelMatrix = glm::mat4(1.0f);
+		//modelMatrix = glm::rotate(modelMatrix, glm::radians(-55.0f), glm::vec3(1.0f, 0.0f, 0.0f));
+		modelMatrix = glm::rotate(modelMatrix, (float)glfwGetTime() * glm::radians(50.0f), glm::vec3(0.5f, 1.0f, 0.0f));
+
+		//View Matrix
+		glm::mat4 viewMatrix = glm::mat4(1.0f);
+		viewMatrix = glm::translate(viewMatrix, glm::vec3(0.0, 0.0f, -3.0f));
+
+		//Projection Matrix
+		glm::mat4 projectionMatrix = glm::mat4(1.0f);
+		projectionMatrix = glm::perspective(glm::radians(45.0f), (float)WIDTH / (float)HEIGHT, 0.1f, 100.0f);
+
+		//Getting the matrix uniform locations
+		unsigned int modelLocation = glGetUniformLocation(shaders.GetID(), "model");
+		unsigned int viewLocation = glGetUniformLocation(shaders.GetID(), "view");
+		unsigned int projLocation = glGetUniformLocation(shaders.GetID(), "projection");
+
+		//Passing the matrices to the vertex shader
+		glUniformMatrix4fv(modelLocation, 1, GL_FALSE, glm::value_ptr(modelMatrix));
+		glUniformMatrix4fv(viewLocation, 1, GL_FALSE, &viewMatrix[0][0]);
+		glUniformMatrix4fv(projLocation, 1, GL_FALSE, glm::value_ptr(projectionMatrix));
+
 ;		// --- Draw Calls ---
-		glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
+		//glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
+
+		//Cube without indices
+		glDrawArrays(GL_TRIANGLES, 0, 36);	
 
 		//Check / call events and swap buffers
 		glfwSwapBuffers(window);

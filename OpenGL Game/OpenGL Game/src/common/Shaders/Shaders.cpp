@@ -94,3 +94,8 @@ void Shaders::ActivateShaders()
 {
 	glUseProgram(m_shaderID);
 }
+
+GLuint Shaders::GetID()
+{
+	return m_shaderID;
+}

@@ -17,6 +17,9 @@ private:
 public:
 	void LoadShader(const char* vertexShaderPath, const char* fragmentShaderPath);
 	void ActivateShaders();
+
+	//Getters
+	GLuint GetID();
 };
 #endif // !__SHADERS__
 
