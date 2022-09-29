@@ -10,12 +10,36 @@
 #include "src/common/Buffers/IndexBuffer.h"
 #include "src/common/Shaders/Shaders.h"
 
-//Global constants
+// --- TODO: 
+//  Create a camera class
+//  Create a shader class
+//  Make my own maths class?
+//  Clean code up
+
+// --- Global constants ---
 const int WIDTH = 800;
 const int HEIGHT = 600;
 
+//Camera stuff
+glm::vec3 cameraPos = glm::vec3(0.0f, 0.0f, 3.0f);
+glm::vec3 cameraFront = glm::vec3(0.0f, 0.0f, -1.0f);
+glm::vec3 cameraUp = glm::vec3(0.0f, 1.0f, 0.0f);
+
+//Eualer stuff
+float lastX = WIDTH / 2;
+float lastY = HEIGHT / 2;
+bool firstMouse = true;
+float yaw = -90.0f;
+float pitch = 0.0f;
+
+//Performance
+float deltaTime = 0.0f;								//Time between current frame and last frame
+float lastFrame = 0.0f;								//Time of last frame
+
 //Callback functions
 void framebuffer_size_callback(GLFWwindow* window, int width, int height);
+void processInput(GLFWwindow* window);
+void mouse_callback(GLFWwindow* window, double xPos, double yPos);
 
 int main()
 {
@@ -235,17 +259,29 @@ int main()
 
 	//Freeing image data
 	stbi_image_free(data);
+	
+	//Hiding the cursor
+	glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
+
+	//Setting the mouse callback
+	glfwSetCursorPosCallback(window, mouse_callback);
 
 	//------------------------------------------------------------------
 	//Render loop / Game loop
 	//------------------------------------------------------------------
 	while (!glfwWindowShouldClose(window))
 	{
+		// --- Performance ---
+		float currentFrame = glfwGetTime();
+		deltaTime = currentFrame - lastFrame;
+		lastFrame = currentFrame;
+
 		//Clear the screen 
 		glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
 		// --- Handle Input ---
+		processInput(window);
 
 		// --- Rendering ---
 		
@@ -265,7 +301,8 @@ int main()
 
 		//View Matrix
 		glm::mat4 viewMatrix = glm::mat4(1.0f);
-		viewMatrix = glm::translate(viewMatrix, glm::vec3(0.0, 0.0f, -3.0f));
+		//viewMatrix = glm::translate(viewMatrix, glm::vec3(0.0, 0.0f, -3.0f));
+		viewMatrix = glm::lookAt(cameraPos, cameraPos + cameraFront, cameraUp);
 
 		//Projection Matrix
 		glm::mat4 projectionMatrix = glm::mat4(1.0f);
@@ -301,4 +338,66 @@ int main()
 void framebuffer_size_callback(GLFWwindow* window, int width, int height)
 {
 	glViewport(0, 0, width, height);
+}
+
+void processInput(GLFWwindow* window)
+{
+	//Press ESC to quit
+	if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS)
+		glfwSetWindowShouldClose(window, true);
+
+	//Camera Movement
+	const float cameraSpeed = 2.5f * deltaTime;
+
+	//Forward
+	if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS)
+		cameraPos += cameraSpeed * cameraFront;
+	
+	//Backward
+	if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS)
+		cameraPos -= cameraSpeed * cameraFront;
+	
+	//Left
+	if (glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS)
+		cameraPos -= glm::normalize(glm::cross(cameraFront, cameraUp)) * cameraSpeed;
+	
+	//Right
+	if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS)
+		cameraPos += glm::normalize(glm::cross(cameraFront, cameraUp)) * cameraSpeed;
+}
+
+void mouse_callback(GLFWwindow* window, double xPos, double yPos)
+{
+	if (firstMouse)
+	{
+		lastX = xPos;
+		lastY = yPos;
+		firstMouse = false;
+	}
+
+	float xOffset = xPos - lastX;
+	float yOffset = lastY - yPos;
+
+	lastX = xPos;
+	lastY = yPos;
+
+	const float sensitivity = 0.1f;
+	xOffset *= sensitivity;
+	yOffset *= sensitivity;
+
+	yaw += xOffset;
+	pitch += yOffset;
+
+	//Restricting users ability to look up and down -89 > 89
+	if (pitch > 89.0f)
+		pitch = 89.0f;
+	if (pitch < -89.0f)
+		pitch = -89.0f;
+
+	//Euler Angles
+	glm::vec3 direction;
+	direction.x = cos(glm::radians(yaw)) * cos(glm::radians(pitch));
+	direction.y = sin(glm::radians(pitch));
+	direction.z = sin(glm::radians(yaw)) * cos(glm::radians(pitch));
+	cameraFront = glm::normalize(direction);
 }
