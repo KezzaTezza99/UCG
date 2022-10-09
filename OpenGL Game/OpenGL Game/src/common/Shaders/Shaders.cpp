@@ -95,6 +95,31 @@ void Shaders::ActivateShaders()
 	glUseProgram(m_shaderID);
 }
 
+void Shaders::SetBool(const std::string& name, bool value) const
+{
+	glUniform1i(glGetUniformLocation(m_shaderID, name.c_str()), (int)value);
+}
+
+void Shaders::SetInt(const std::string& name, int value) const
+{
+	glUniform1i(glGetUniformLocation(m_shaderID, name.c_str()), value);
+}
+
+void Shaders::SetFloat(const std::string& name, float value) const
+{
+	glUniform1i(glGetUniformLocation(m_shaderID, name.c_str()), value);
+}
+
+void Shaders::SetVec3(const std::string& name, maths::vec3 value) const
+{
+	glUniform3i(glGetUniformLocation(m_shaderID, name.c_str()), value.x, value.y, value.z);
+}
+
+void Shaders::SetMat4(const std::string& name, glm::mat4 value) const
+{
+	glUniformMatrix4fv(m_shaderID, 1, GL_FALSE, glm::value_ptr(value));
+}
+
 GLuint Shaders::GetID()
 {
 	return m_shaderID;

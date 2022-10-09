@@ -9,12 +9,15 @@
 #include "src/common/Buffers/VertexBuffer.h"
 #include "src/common/Buffers/IndexBuffer.h"
 #include "src/common/Shaders/Shaders.h"
+#include "src/common/Models/TextureLoader.h"
 
 // --- TODO: 
 //  Create a camera class
 //  Create a shader class
 //  Make my own maths class?
 //  Clean code up
+//	Performance class?
+//	Image class?
 
 // --- Global constants ---
 const int WIDTH = 800;
@@ -85,42 +88,18 @@ int main()
 	//Enabling the use of the z buffer
 	glEnable(GL_DEPTH_TEST);
 
-	//Setting the viewport
-	//glViewport(0, 0, 800, 600);
-
 	//------------------------------------------------------------------
 	// Add all code here
-	// 
-	//TODO: Make a primitive shapes class? - Easily add shapes if needed	
 	//------------------------------------------------------------------
 	
-	////Simple Triangle
-	//GLfloat vertices[] =
-	//{
-	//	//Positions					//Colours
-	//	-0.5f, -0.5f, 0.0f,			0.0f, 1.0f, 0.0f,			//Bottom left
-	//	 0.5f, -0.5f, 0.0f,			1.0f, 0.0f, 0.0f,			//Bottom right
-	//	 0.0f,  0.5f, 0.0f,			0.0f, 0.0f, 1.0f			//Top
-	//};
-
-	//Textured Quad
-	//float vertices[] = 
-	//{
-	//	// positions          // colors           // texture coords
-	//	 0.5f,  0.5f, 0.0f,   1.0f, 0.0f, 0.0f,   1.0f, 1.0f,   // top right
-	//	 0.5f, -0.5f, 0.0f,   0.0f, 1.0f, 0.0f,   1.0f, 0.0f,   // bottom right
-	//	-0.5f, -0.5f, 0.0f,   0.0f, 0.0f, 1.0f,   0.0f, 0.0f,   // bottom left
-	//	-0.5f,  0.5f, 0.0f,   1.0f, 1.0f, 0.0f,   0.0f, 1.0f    // top left 
-	//};
-
-	unsigned int indices[] =
+	GLuint indices[] =
 	{
 		0, 1, 3, // first triangle
 		1, 2, 3  // second triangle
 	};
 
 	//3D Cube
-	float vertices[] = 
+	GLfloat vertices[] = 
 	{
 		//Positions					//Texture Coords
 		-0.5f, -0.5f, -0.5f,		0.0f, 0.0f,
@@ -166,15 +145,20 @@ int main()
 		-0.5f,  0.5f, -0.5f,		0.0f, 1.0f
 	};
 
-	//Shapes
-	//maths::vec3 bottomLeft = maths::vec3(-0.5f, -0.5f, 0.0f);
-	//maths::vec3 bottomRight = maths::vec3(0.5f, -0.5f, 0.0f);
-	//maths::vec3 top = maths::vec3(0.0f, 0.5f, 0.0f);
-
-	////TODO: Clean this up, not efficent but dont have the energy to come up with a solution rn
-	//PrimitiveShapes triangle;
-	//GLfloat* vertices = triangle.DrawTriangle(bottomLeft, bottomRight, top);
-	//std::cout << "Debug Info (EntryPoint) -" << "		" << "Vertices " << vertices << std::endl;
+	////World space positions of a bunch of cubes
+	//glm::vec3 cubePositions[] =
+	//{
+	//	glm::vec3(0.0f,  0.0f,  0.0f),
+	//	glm::vec3(2.0f,  5.0f, -15.0f),
+	//	glm::vec3(-1.5f, -2.2f, -2.5f),
+	//	glm::vec3(-3.8f, -2.0f, -12.3f),
+	//	glm::vec3(2.4f, -0.4f, -3.5f),
+	//	glm::vec3(-1.7f,  3.0f, -7.5f),
+	//	glm::vec3(1.3f, -2.0f, -2.5f),
+	//	glm::vec3(1.5f,  2.0f, -2.5f),
+	//	glm::vec3(1.5f,  0.2f, -1.5f),
+	//	glm::vec3(-1.3f,  1.0f, -1.5f)
+	//};
 
 	// --- Buffers ---
 	//VAO
@@ -192,62 +176,32 @@ int main()
 	indexBuffer.Bind();
 	//TODO: Also need to think about handling this inside the IBO class
 	glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indices), indices, GL_STATIC_DRAW);
-
-	// --- Setting attributes ---
-		// OLD
-		/*//Position 
-		glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)0);
-		glEnableVertexAttribArray(0);
-
-		//Colour
-		glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)(3 * sizeof(float)));
-		glEnableVertexAttribArray(1);
-
-		//Texcoords
-		glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)(6 * sizeof(float)));
-		glEnableVertexAttribArray(2);
-	*/
-	//Pos
+	
+	//Setting the vertex attributes in the vertex shader - Position then UVs
 	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 5 * sizeof(float), (void*)0);
 	glEnableVertexAttribArray(0);
-
-	//UVs
+	
 	glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 5 * sizeof(float), (void*)(3 * sizeof(float)));
 	glEnableVertexAttribArray(1);
 
 	// --- Shaders ---
+	//Textured cube
 	Shaders shaders;
-	shaders.LoadShader("src/common/Shaders/GLSL/VertexShader.vs", "src/common/Shaders/GLSL/FragmentShader.vs");
+	shaders.LoadShader("src/common/Shaders/GLSL/BasicVertex.shader", "src/common/Shaders/GLSL/BasicFragment.shader");
 
 	// --- Textures ---
-	//Creating and binding a texture - TODO: Make this into a class
-	GLuint texture;
-	glGenTextures(1, &texture);
-	glBindTexture(GL_TEXTURE_2D, texture);
-	
-	// Setting the textures wrapping / filtering options
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+	TextureLoader texture;
+	texture.Bind();
+	texture.SetTextureParams();
 
+	//TODO: Create an image class?
 	//Loading the image that will be used as a texture
 	int width, height, channels;
 	unsigned char* data = stbi_load("src/assets/Textures/wood.png", &width, &height, &channels, 0);
 
-	/*
-		// --- Transformations ---
-		glm::mat4 transform = glm::mat4(1.0f);
-		transform = glm::rotate(transform, glm::radians(90.0f), glm::vec3(0.0, 0.0, 1.0f));
-		transform = glm::scale(transform, glm::vec3(0.5, 0.5, 0.5));
-
-		//Sending the transform to the vertex shader
-		unsigned int transformLocation = glGetUniformLocation(shaders.GetID(), "transform");
-		glUniformMatrix4fv(transformLocation, 1, GL_FALSE, glm::value_ptr(transform));
-	*/
-
 	if (data)
 	{
+		//TODO: Image class and pass image object to texture class and do this stuff there?
 		//Generating the texture from the loaded image
 		glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, data);
 		glGenerateMipmap(GL_TEXTURE_2D);
@@ -266,6 +220,10 @@ int main()
 	//Setting the mouse callback
 	glfwSetCursorPosCallback(window, mouse_callback);
 
+	//Projection Matrix - Doesn't change so no point recalculating every frame
+	glm::mat4 projectionMatrix = glm::mat4(1.0f);
+	projectionMatrix = glm::perspective(glm::radians(45.0f), (float)WIDTH / (float)HEIGHT, 0.1f, 100.0f);
+
 	//------------------------------------------------------------------
 	//Render loop / Game loop
 	//------------------------------------------------------------------
@@ -283,30 +241,25 @@ int main()
 		// --- Handle Input ---
 		processInput(window);
 
+
 		// --- Rendering ---
 		
 		//Activating shaders
 		shaders.ActivateShaders();
 		
-		// --- New way ---		
-		//Re-binding the texture
-		glBindTexture(GL_TEXTURE_2D, texture);
+		//Re-binding
+		texture.Bind();
 		vertexArray.Bind();
 
 		// --- Matrices ---
-		//Model Matrix
+		//Model Matrix - One Cube
 		glm::mat4 modelMatrix = glm::mat4(1.0f);
-		//modelMatrix = glm::rotate(modelMatrix, glm::radians(-55.0f), glm::vec3(1.0f, 0.0f, 0.0f));
 		modelMatrix = glm::rotate(modelMatrix, (float)glfwGetTime() * glm::radians(50.0f), glm::vec3(0.5f, 1.0f, 0.0f));
-
+		
 		//View Matrix
 		glm::mat4 viewMatrix = glm::mat4(1.0f);
 		//viewMatrix = glm::translate(viewMatrix, glm::vec3(0.0, 0.0f, -3.0f));
 		viewMatrix = glm::lookAt(cameraPos, cameraPos + cameraFront, cameraUp);
-
-		//Projection Matrix
-		glm::mat4 projectionMatrix = glm::mat4(1.0f);
-		projectionMatrix = glm::perspective(glm::radians(45.0f), (float)WIDTH / (float)HEIGHT, 0.1f, 100.0f);
 
 		//Getting the matrix uniform locations
 		unsigned int modelLocation = glGetUniformLocation(shaders.GetID(), "model");
@@ -324,6 +277,20 @@ int main()
 		//Cube without indices
 		glDrawArrays(GL_TRIANGLES, 0, 36);	
 
+		/*
+			//Multiple Cubes
+			for (unsigned int i = 0; i < 10; i++)
+			{
+				glm::mat4 modelMatrix = glm::mat4(1.0f);
+				modelMatrix = glm::translate(modelMatrix, cubePositions[i]);
+				float angle = 20.0f * i;
+				modelMatrix = glm::rotate(modelMatrix, glm::radians(angle), glm::vec3(1.0f, 0.3f, 0.5f));
+				glUniformMatrix4fv(modelLocation, 1, GL_FALSE, glm::value_ptr(modelMatrix));
+
+				glDrawArrays(GL_TRIANGLES, 0, 36);
+			}
+		*/
+		
 		//Check / call events and swap buffers
 		glfwSwapBuffers(window);
 		glfwPollEvents();
